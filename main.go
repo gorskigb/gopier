@@ -1,19 +1,18 @@
 package main
 
 import (
-
+	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"os"
-	"encoding/json"
-	"fmt"
 )
 
 func main() {
 	jsonFile, err := os.Open("files_to_copy.json")
 
-	if(err != nil){
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -25,39 +24,38 @@ func main() {
 
 	json.Unmarshal(byteValue, &files)
 
-	for i := 0; i < len(files.Files); i++{
+	for i := 0; i < len(files.Files); i++ {
 		fmt.Println(files.Files[i].From)
 		copy(files.Files[i].From, files.Files[i].To)
 	}
 
-	
 }
 
-func copy(fromPath, toPath string) (int64, error){
+func copy(fromPath, toPath string) (int64, error) {
 	from, err := os.Open(fromPath)
 
-	if (err != nil){
+	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer from.Close()
 
 	destination, err := os.Create(toPath)
-	
+
 	if err != nil {
-        log.Fatal(err)
-    }
-	
+		log.Fatal(err)
+	}
+
 	defer destination.Close()
 
 	return io.Copy(destination, from)
 }
 
-type Files struct{
+type Files struct {
 	Files []File `json:"files"`
 }
 
 type File struct {
 	From string `json:"from"`
-	To string `json:"to"`
+	To   string `json:"to"`
 }
